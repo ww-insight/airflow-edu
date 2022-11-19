@@ -26,10 +26,12 @@ default_arguments = {
     'retry_delay': timedelta(seconds=5)
 }
 
-def create_img(dots = 300):
+def create_img(img_folder = '/tmp/airflow-images/', dots = 300):
     a = np.random.rand(dots, dots, dots)
     img = Image.fromarray(a, mode='RGB')
-    img.save('/tmp/airflow-images/img.png')
+    img_path = f'{img_folder}/img.png'
+    img.save(img_path)
+    return img_path
 
 def send_mail(send_from, send_to, subject, text, server="127.0.0.1"):
     assert isinstance(send_to, list)
@@ -64,10 +66,17 @@ with DAG(
 ) as dag:
     task_create_img = PythonOperator(
         task_id='createImg',
-        python_callable=create_img
+        python_callable=create_img,
+        do_xcom_push=True
     )
     task_send_mail = PythonOperator(
         task_id='sendMail',
-        python_callable=send_mail
+        python_callable=send_mail,
+        op_kwargs={
+            'send_from': 'airflow',
+            'send_to': ['ww.bel@ya.ru'],
+            'subject': 'test from airflow',
+            'text': 'Hello from Airflow!'
+        }
     )
     task_create_img >> task_send_mail
