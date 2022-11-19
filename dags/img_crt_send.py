@@ -33,7 +33,7 @@ def create_img(img_folder = '/tmp/airflow-images/', dots = 300):
     img.save(img_path)
     return img_path
 
-def send_mail(send_from, send_to, subject, text, server="127.0.0.1"):
+def send_mail(send_from, send_to, subject, text, img_dir='/tmp/airflow-images', server="127.0.0.1"):
     assert isinstance(send_to, list)
 
     msg = MIMEMultipart()
@@ -43,8 +43,8 @@ def send_mail(send_from, send_to, subject, text, server="127.0.0.1"):
 
     msg.attach(MIMEText(text))
 
-    for f in os.listdir('/tmp/airflow-images') or []:
-        with open(f, "rb") as fil:
+    for f in os.listdir(img_dir) or []:
+        with open(f'{img_dir}/{f}', "rb") as fil:
             part = MIMEApplication(
                 fil.read(),
                 Name=basename(f)
