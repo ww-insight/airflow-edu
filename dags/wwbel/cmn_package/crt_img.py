@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+from datetime import datetime
 
 
 def create_img(img_folder='/tmp/airflow-images/', dots=10):
