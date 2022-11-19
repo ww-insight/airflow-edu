@@ -21,7 +21,7 @@ default_arguments = {
 def create_img(dots = 300):
     a = np.random.rand(dots, dots, dots)
     img = Image.fromarray(a, mode='RGB')
-    return np.asarray(img)
+    img.save('/tmp/airflow-images')
 
 
 with DAG(
