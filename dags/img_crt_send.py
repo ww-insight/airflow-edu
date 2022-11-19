@@ -10,6 +10,7 @@ import os
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.bash import BashOperator
+from airflow.utils.trigger_rule import TriggerRule
 from datetime import timedelta, datetime
 from PIL import Image
 import numpy as np
@@ -104,7 +105,7 @@ with DAG(
     task_remove_dir = BashOperator(
         task_id='removeDir',
         bash_command='rm -rf /tmp/airflow-images/',
-
+        trigger_rule=TriggerRule.ALWAYS
     )
     task_prepare_dir >> [task_create_img, task_create_img2] >> task_send_mail >> task_remove_dir
 
