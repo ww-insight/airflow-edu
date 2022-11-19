@@ -93,8 +93,8 @@ with DAG(
                 Hello!
                 
                 Sending images:
-                    - {{ task_instance.xcom_pull(task_ids='task_create_img') }}
-                    - {{ task_instance.xcom_pull(task_ids='task_create_img2') }}
+                    - {{ task_instance.xcom_pull(task_ids='createImg') }}
+                    - {{ task_instance.xcom_pull(task_ids='createImg2') }}
                 --
                 Sincerely, your Airflow
                 """
