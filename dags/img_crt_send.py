@@ -5,11 +5,19 @@ Reads config to determine wich plots to make
 Creating plot images
 Sends images with an email
 """
+import os
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import timedelta, datetime
 from PIL import Image
 import numpy as np
+
+import smtplib
+from os.path import basename
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 default_arguments = {
     'owner': 'wwbel',
@@ -23,6 +31,30 @@ def create_img(dots = 300):
     img = Image.fromarray(a, mode='RGB')
     img.save('/tmp/airflow-images/img.png')
 
+def send_mail(send_from, send_to, subject, text, server="127.0.0.1"):
+    assert isinstance(send_to, list)
+
+    msg = MIMEMultipart()
+    msg['From'] = send_from
+    msg['To'] = '; '.join(send_to)
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(text))
+
+    for f in os.listdir('/tmp/airflow-images') or []:
+        with open(f, "rb") as fil:
+            part = MIMEApplication(
+                fil.read(),
+                Name=basename(f)
+            )
+        # After the file is closed
+        part['Content-Disposition'] = 'attachment; filename="%s"' % basename(f)
+        msg.attach(part)
+
+
+    smtp = smtplib.SMTP(server)
+    smtp.sendmail(send_from, send_to, msg.as_string())
+    smtp.close()
 
 with DAG(
         "img_crt_send",
@@ -32,6 +64,9 @@ with DAG(
 ) as dag:
     task_create_img = PythonOperator(
         task_id='createImg',
-        python_callable=create_img,
-        do_xcom_push=True
+        python_callable=create_img
+    )
+    task_send_mail = PythonOperator(
+        task_id='sendMail',
+        python_callable=send_mail
     )
