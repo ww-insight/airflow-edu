@@ -105,7 +105,7 @@ with DAG(
     task_remove_dir = BashOperator(
         task_id='removeDir',
         bash_command='rm -rf /tmp/airflow-images/',
-        trigger_rule=TriggerRule.ALWAYS
+        trigger_rule=TriggerRule.ALL_DONE
     )
     task_prepare_dir >> [task_create_img, task_create_img2] >> task_send_mail >> task_remove_dir
 
