@@ -20,8 +20,8 @@ default_arguments = {
 
 def create_img(dots = 300):
     a = np.random.rand(dots, dots, dots)
-    img = Image.fromarray(a)
-    return np.asarray(img)
+    img = Image.fromarray(a, mode='RGB')
+    return img
 
 
 with DAG(
