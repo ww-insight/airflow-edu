@@ -31,6 +31,7 @@ default_arguments = {
 def create_img(img_folder='/tmp/airflow-images/', dots=30):
     a = np.random.rand(dots, dots, dots)
     img = Image.fromarray(a, mode='RGB')
+    assert dots != 30 # raise an error
     img_path = f'{img_folder}/img_{dots}_{datetime.now().strftime("%Y%m%d")}.png'
     img.save(img_path)
     return img_path
@@ -100,5 +101,10 @@ with DAG(
                 """
         }
     )
-    task_prepare_dir >> [task_create_img, task_create_img2] >> task_send_mail
+    task_remove_dir = BashOperator(
+        task_id='removeDir',
+        bash_command='rm -rf /tmp/airflow-images/',
+
+    )
+    task_prepare_dir >> [task_create_img, task_create_img2] >> task_send_mail >> task_remove_dir
 
