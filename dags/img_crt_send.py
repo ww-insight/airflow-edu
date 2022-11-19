@@ -70,3 +70,4 @@ with DAG(
         task_id='sendMail',
         python_callable=send_mail
     )
+    task_create_img >> task_send_mail
